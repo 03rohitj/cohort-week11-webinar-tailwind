@@ -1,45 +1,89 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import { SidebarLinkButton } from './components/sidebar_navigation_links'
-import { Sidebar } from './components/sidebar'
-import { SidebarHeader } from './components/sidebar_header_link'
-import { MainOuter } from './components/main_outer'
-import { MainCentral } from './components/main_central'
-import { MainDateNavigation } from './components/main_center_date_head'
-import { MainCenterEvents } from './components/main_center_events'
+import { useEffect, useState } from "react"
+// import { useMediaQuery } from '@mui/material';
+import { SidebarToggleBtn } from "./components/SidebarToggleBtn";
+
+const useMediaQuery = (query) => {
+  const [matches, setMatches] = useState(false);
+  
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    if(media.matches != matches)
+      setMatches(media.matches);
+
+    const listener = () => setMatches(media.matches);
+    media.addEventListener('change', listener);
+    return () => {
+      media.removeEventListener('change', listener);
+    }
+  }, [matches, query]);
+
+
+  return matches;
+};
 
 function App() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  useEffect( () => {
+    console.error("IsDesktop : ", isDesktop);
+    if(!isDesktop)
+      setSidebarOpen(false);
+    else
+      setSidebarOpen(true);
+  }, [isDesktop]);
+
+
   return (
-    <div className='flex flex-row h-screen w-screen'> 
-      <Sidebar> 
-        <SidebarHeader/>
-        <SidebarLinkButton text={"Home"} image={"https://static-00.iconduck.com/assets.00/home-icon-512x510-7enk0ake.png"}/>
-        <SidebarLinkButton text={"Webinars"} image={"https://png.pngtree.com/png-clipart/20230421/original/pngtree-webinar-line-icon-png-image_9073323.png"}/>
-        <SidebarLinkButton text={"Billings"} image={"https://static.thenounproject.com/png/921694-200.png"}/>
-        <SidebarLinkButton text={"Settings"} image={"https://icons.veryicon.com/png/o/miscellaneous/user-center/account-settings-11.png"}/>
-        <SidebarLinkButton text={"Recordings"} image={"https://static.vecteezy.com/system/resources/thumbnails/047/798/473/small_2x/retro-vintage-microphone-on-white-background-logo-mic-silhouette-sign-music-voice-record-icon-recording-studio-symbol-vector.jpg"}/>
-      </Sidebar>
-
-      
-        <MainOuter>
-          <p className='font-medium p-4 text-base'>Sun Mar 23 2025</p>
-          <p className='font-semibold text-3xl p-4'>Good Afternoon, Rohit Jangid!</p>
-          {/* <div className='flex flex-row justify-between'> */}
-            <MainCentral>
-              <MainDateNavigation/>
-              <MainCenterEvents/>
-            </MainCentral>
-          {/* </div> */}
-        </MainOuter>
-
-          {/* <div className='w-1/3 bg-blue-300'></div>
-          <div className='w-2/3 bg-green-300'></div> */}
-       
+    <div className="flex">
+      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
+      <MainContent sidebarOpen={sidebarOpen}/>
     </div>
   )
   
+}
+
+function Sidebar({sidebarOpen, setSidebarOpen}){
+
+  if(sidebarOpen){
+    return <div className="w-96 h-screen bg-blue-100 m-2 fixed top-0 left-0 md:relative">
+      <div>
+        <div className="cursor-pointer hover:bg-slate-300" onClick={() => setSidebarOpen(!sidebarOpen)}>
+          <SidebarToggleBtn/>
+        </div>
+      </div>
+    </div>
+  }
+
+  return <div className="fixed top-0 left-0 m-2 bg-blue-100">
+    <div>
+      <div className="cursor-pointer hover:bg-slate-300" onClick={() => setSidebarOpen(!sidebarOpen)}>
+        <SidebarToggleBtn/>
+      </div>
+    </div>
+</div>
+
+
+}
+
+function MainContent(){
+  return <div className="w-full m-2">
+    <div className="h-72 bg-black md:block hidden rounded-xl"></div>
+    <div className="grid grid-cols-11 gap-4 p-4">
+      <div className="h-96 bg-red-200 rounded-2xl shadow col-span-11 md:col-span-2 -translate-y-24 hidden md:block">
+
+      </div>
+
+      <div className="h-96 bg-green-200 rounded-2xl shadow col-span-11 md:col-span-6">
+        
+      </div>
+
+      <div className="h-96 bg-yellow-200 rounded-2xl shadow col-span-11 md:col-span-3">
+        
+      </div>
+
+    </div>
+  </div>
 }
 
 export default App
